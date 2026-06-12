@@ -1,0 +1,7 @@
+vpc-name = "Demo-Nginx"
+cidr-block = "10.0.0.0/16"
+instance_tenancy = "default"
+Name = "Demo-of-Nginx"
+bucket-name = "demo-26--bucket-priyanshu-2026069"
+instance-type = "t3.micro"
+key-pair = "ansible-green"
