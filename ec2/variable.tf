@@ -6,7 +6,7 @@ variable "instance-type" {
   default = "t3.micro"
 }
 
-variable "Public-subnet-1-id" {
+variable "public_1_subnet_id" {
   type = string
 }
 

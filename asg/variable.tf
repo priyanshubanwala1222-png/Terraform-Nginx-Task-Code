@@ -6,6 +6,10 @@ variable "instance-type" {
   default = "t3.small"
 }
 
+variable "NAME" {
+  default = "Private"
+}
+
 variable "key-name" {
   default = "ansible-green"
 }

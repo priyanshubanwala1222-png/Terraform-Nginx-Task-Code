@@ -1,22 +1,17 @@
 resource "aws_security_group" "sg-alb" {
-  name        = "${var.NAME}-alb-sg-nginx"
+  name        = "${var.NAME}-alb-sg"
   description = "Allow HTTP and HTTPS inbound from the internet"
   vpc_id      = var.vpc-id
 
-  ingress {
-    description = "HTTPS from internet"
-    from_port   = var.from-port-alb-sg-80
-    to_port     = var.from-port-alb-sg-80
-    protocol    = var.protocol-tcp
-    cidr_blocks = ["0.0.0.0/0"] 
-  }
-
-  ingress {
-    description = "HTTPS from internet"
-    from_port   = var.from-port-alb-sg-443
-    to_port     = var.from-port-alb-sg-443
-    protocol    = var.protocol-tcp
-    cidr_blocks = var.CIDR-0-0
+  dynamic "ingress" {
+    for_each = var.alb_ingress_rules
+    content {
+      description = ingress.value.description
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = var.protocol-tcp
+      cidr_blocks = ingress.value.cidr_block
+    }
   }
 
   egress {
@@ -32,6 +27,10 @@ resource "aws_security_group" "sg-alb" {
   }
 }
 
+data "http" "my_public_ip" {
+  url = "https://ifconfig.me/ip"
+}
+
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-sg-${var.NAME}"
   description = "Allow SSH inbound to Bastion host"
@@ -42,7 +41,7 @@ resource "aws_security_group" "bastion_sg" {
     from_port   = var.from-port-alb-sg-22
     to_port     = var.from-port-alb-sg-22
     protocol    = var.protocol-tcp
-    cidr_blocks = var.CIDR-0-0
+    cidr_blocks = ["${chomp(data.http.my_public_ip.response_body)}/32"]
   }
 
   egress {
@@ -63,22 +62,28 @@ resource "aws_security_group" "private-ec2-sg" {
   description = "Allow HTTP from ALB only; all outbound"
   vpc_id      = var.vpc-id
 
-  ingress {
-    description = "SSH from Bastion"
-    from_port   = var.from-port-alb-sg-22
-    to_port     = var.from-port-alb-sg-22
-    protocol    = var.protocol-tcp
-    security_groups = [aws_security_group.bastion_sg.id]
-  }
+  dynamic "ingress" {
+    for_each = [
+      {
+        description     = "SSH from Bastion"
+        port            = var.from-port-alb-sg-22
+        security_groups = [aws_security_group.bastion_sg.id]
+      },
+      {
+        description     = "PORT-80"
+        port            = var.from-port-alb-sg-80
+        security_groups = [aws_security_group.sg-alb.id]
+      }
+    ]
 
-  ingress {
-    description = "POR80"
-    from_port   = var.from-port-alb-sg-80
-    to_port     = var.from-port-alb-sg-80
-    protocol    = var.protocol-tcp
-    security_groups = [aws_security_group.sg-alb.id]
+    content {
+      description     = ingress.value.description
+      from_port       = ingress.value.port
+      to_port         = ingress.value.port
+      protocol        = var.protocol-tcp
+      security_groups = ingress.value.security_groups
+    }
   }
-  
 
   egress {
     description = "All outbound SSH"
@@ -89,6 +94,6 @@ resource "aws_security_group" "private-ec2-sg" {
   }
 
   tags = {
-    Name = "${var.NAME}--infra-ec2-sg"
+    Name = "${var.NAME}-infra-asg-sg"
   }
 }

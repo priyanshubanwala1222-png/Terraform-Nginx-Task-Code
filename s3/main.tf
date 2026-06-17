@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "s3_bucket" {
   bucket = var.s3-bucket-name
 
   lifecycle {
-    prevent_destroy = true # false to delete
+    prevent_destroy = false # false to delete
   }
 
   tags = {

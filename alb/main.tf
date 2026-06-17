@@ -4,8 +4,8 @@ resource "aws_lb" "as-2-alb" {
   load_balancer_type = "application"
   security_groups    = [var.alb-sg]
   subnets            = [
-    var.Public-subnet-1-id,
-    var.Public-subnet-2-id,
+    var.Public-subnet-id-1,
+    var.Public-subnet-id-2,
   ]
 
   enable_deletion_protection = false

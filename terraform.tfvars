@@ -1,4 +1,5 @@
 vpc-name = "Demo-Nginx"
+vpc-Name = "Nginxp-infra--"
 cidr-block = "10.0.0.0/16"
 instance_tenancy = "default"
 Name = "Demo-of-Nginx"

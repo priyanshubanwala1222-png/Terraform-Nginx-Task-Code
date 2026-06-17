@@ -12,14 +12,14 @@ resource "aws_launch_template" "lt-as-2" {
     http_put_response_hop_limit = 1
   }
 
-    user_data = base64encode(<<-EOF
-              #!/bin/bash
-              apt-get update -y
-              apt-get install nginx -y
-              systemctl start nginx
-              systemctl enable nginx
-              EOF
-  )
+  #   user_data = base64encode(<<-EOF
+  #             #!/bin/bash
+  #             apt-get update -y
+  #             apt-get install nginx -y
+  #             systemctl start nginx
+  #             systemctl enable nginx
+  #             EOF
+  # )
 
   tag_specifications {
     resource_type = "instance"
@@ -38,8 +38,8 @@ resource "aws_autoscaling_group" "asg-as-2" {
   name                      = "as-2-asg-terraform"
   max_size                  = 3
   min_size                  = 1
-  health_check_grace_period = 100
-  health_check_type         = "ELB"
+  health_check_grace_period = 600
+  health_check_type         = "EC2"
   desired_capacity          = 1
   vpc_zone_identifier       = [var.Private-subnet-1-id, 
                                var.Private-subnet-2-id, ]
@@ -59,9 +59,15 @@ resource "aws_autoscaling_group" "asg-as-2" {
   }
 
   tag {
-  key                 = "Role"
-  value               = "webserver"
-  propagate_at_launch = true
+    key                 = "Name"
+    value               = "Private-asg-worker"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Role"
+    value               = "webserver"
+    propagate_at_launch = true
   }
 
   tag {
@@ -126,3 +132,48 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low-as-1" {
     AutoScalingGroupName = aws_autoscaling_group.asg-as-2.name
   }
 }
+
+# resource "time_sleep" "wait_45_seconds" {
+#   depends_on      = [aws_autoscaling_group.asg-as-2]
+#   create_duration = "45s" 
+# }
+
+# resource "terraform_data" "generate_inventory" {
+#   triggers_replace = {
+#     always_run = timestamp() 
+#   }
+
+#   provisioner "local-exec" {
+#     command = <<EOT
+#       echo "Waiting briefly for AWS networking interfaces..."
+#       sleep 5
+#       echo "Querying live AWS API for running instances with tag 'Private-asg-worker'..."
+      
+#       echo "[webservers]" > ${path.root}/inventory.ini
+      
+#       aws ec2 describe-instances \
+#         --filters "Name=tag:Name,Values=Private-asg-worker" "Name=instance-state-name,Values=running" \
+#         --query "Reservations[*].Instances[*].PrivateIpAddress" \
+#         --output text | tr '\t' '\n' >> ${path.root}/inventory.ini
+        
+#       echo "--- Final Generated inventory.ini content ---"
+#       cat ${path.root}/inventory.ini
+#     EOT
+#   }
+
+#   depends_on = [time_sleep.wait_45_seconds]
+# }
+
+# data "aws_instances" "asg_workers" {
+#   filter {
+#     name   = "tag:Name"
+#     values = ["Private-asg-worker"]
+#   }
+
+#   filter {
+#     name   = "instance-state-name"
+#     values = ["running"]
+#   }
+
+#   depends_on = [time_sleep.wait_45_seconds]
+# }

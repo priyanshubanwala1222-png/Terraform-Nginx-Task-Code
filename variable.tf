@@ -2,6 +2,10 @@ variable "vpc-name" {
   default = "as-2"
 }
 
+variable "vpc-Name" {
+  default = "Nginx-infra"
+}
+
 variable "cidr-block" {
   default = "10.0.0.0/16"
 }

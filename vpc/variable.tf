@@ -8,11 +8,11 @@ variable "instance_tenancy" {
     default = "default"
 }
 
-variable "Name" {
+variable "vpc-Name" {
     type = string
-    default = "vpc-by-terraform-as-2"
+    default = "vpc-by-terraform-nginx"
 }
 
-variable "Public-subnet-1-id" {
+variable "public_1_subnet_id" {
  type = string
 }

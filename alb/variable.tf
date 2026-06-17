@@ -1,8 +1,8 @@
-variable "Public-subnet-1-id" {
+variable "Public-subnet-id-1" {
   type = string
 }
 
-variable "Public-subnet-2-id" {
+variable "Public-subnet-id-2" {
   type = string
 }
 

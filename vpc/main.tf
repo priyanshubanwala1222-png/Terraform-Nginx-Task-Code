@@ -3,7 +3,7 @@ resource "aws_vpc" "VPC_structure" {
   instance_tenancy = var.instance_tenancy
 
   tags = {
-    Name = var.Name
+    Name = var.vpc-Name
   }
 }
 
@@ -11,7 +11,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.VPC_structure.id
 
   tags = {
-    Name = "${var.Name}-igw"
+    Name = "${var.vpc-Name}-igw"
   }
 }
 
@@ -19,16 +19,16 @@ resource "aws_eip" "elastic-ip" {
   domain   = "vpc"
 
   tags = {
-    Name = "${var.Name}-elastic-ip"
+    Name = "${var.vpc-Name}-elastic-ip"
   }
 }
 
 resource "aws_nat_gateway" "nat-gateway" {
   allocation_id = aws_eip.elastic-ip.id
-  subnet_id     = var.Public-subnet-1-id
+  subnet_id     = var.public_1_subnet_id
   depends_on = [aws_internet_gateway.igw]
 
   tags = {
-    Name = "${var.Name}-nat-gt"
+    Name = "${var.vpc-Name}-nat-gt"
   }
 }

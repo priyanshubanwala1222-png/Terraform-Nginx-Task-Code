@@ -13,3 +13,8 @@ output "autoscaling-policy-in" {
 output "cloudwatch" {
   value = aws_cloudwatch_metric_alarm.cpu_high-as-1
 }
+
+# output "private_instance_ips" {
+#   value       = data.aws_instances.asg_workers.private_ips
+#   description = "Dynamic private IPs"
+# }
