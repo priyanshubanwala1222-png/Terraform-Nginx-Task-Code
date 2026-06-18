@@ -38,7 +38,7 @@ output "RT-Private" {
   value = module.subnet_base.Route-table-private-id
 }
 
-output "bastion-ec2-id" {
+output "bastion-public-ip" {
   value = module.ec2_base.bastion-ec2-ip
 }
 
