@@ -66,14 +66,14 @@ output "asg" {
   value = module.asg_base.auto-scalling
 }
 
-output "s3-bucket-id" {
-  value = module.s3_base.s3-bucket
-}
+#output "s3-bucket-id" {
+ # value = module.s3_base.s3-bucket
+#}
 
-output "s3-arn" {
-  value = module.s3_base.s3-arn
-}
+#output "s3-arn" {
+ # value = module.s3_base.s3-arn
+#}
 
-output "DB" {
-  value = module.s3_base.DB
-}
+#output "DB" {
+ # value = module.s3_base.DB
+#}
