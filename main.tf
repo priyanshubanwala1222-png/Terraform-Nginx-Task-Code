@@ -43,10 +43,10 @@ module "asg_base" {
   key-name            = var.key-pair
 }
 
-module "s3_base" {
-  source = "./s3"
-  s3-bucket-name = var.bucket-name
-}
+#module "s3_base" {
+ # source = "./s3"
+  #s3-bucket-name = var.bucket-name
+#}
 
 resource "local_file" "ansible_vars" {
   filename = "${path.module}/bastion_vars.yml"
